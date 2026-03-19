@@ -1,98 +1,111 @@
-# 🛰️ Home Network Intelligence System (HNIS)
+# 🧠 Project Nexus
 
-> *Privacy-first. Local-first. Signal over noise.*
+> *Multi-agent autonomous planning. Built for durability, not demos.*
 
-HNIS is a personal OSINT and safety monitoring platform that watches public surfaces, processes incoming signals, filters noise, and delivers actionable intelligence — all without sending sensitive data to the cloud.
-
-Built by someone who depends on technology working reliably and privately, for people who feel the same way.
+Nexus is a LangGraph-based multi-agent autonomous planning system designed for real-world reasoning workloads. It coordinates a team of specialized AI agents through structured, self-correcting pipelines — built around the principle that a system that catches its own mistakes is worth more than one that never admits to making them.
 
 -----
 
 ## What Problem This Solves
 
-Most monitoring and alerting tools require you to either trust a third-party cloud with your data, manually check sources yourself, or accept a flood of noise with no intelligent filtering.
+Most AI implementations are single-model, single-prompt, single-shot. They work in controlled conditions and fail quietly in production. They hallucinate without correction. They have no memory of what they’ve done or why.
 
-HNIS solves all three. It runs locally, watches automatically, thinks before it alerts, and delivers only what actually matters — directly to your device.
+Nexus is built differently. It distributes reasoning across specialized agents, each with a defined role and scope. It routes work intelligently, corrects errors in-loop, and maintains persistent memory of decisions and context across sessions.
 
 -----
 
-## What It Does
+## The Agent Team
 
-- **Monitors** public web surfaces, safety feeds, and configurable OSINT sources continuously
-- **Processes** incoming signals through a local AI layer that understands context, not just keywords
-- **Filters** aggressively — most noise never reaches you
-- **Delivers** clean, actionable alerts locally to your device on your schedule
-- **Visualizes** activity through a local dashboard designed with accessibility in mind
+|Agent         |Role                                                                             |
+|--------------|---------------------------------------------------------------------------------|
+|**Auditor**   |Validates inputs, outputs, and intermediate reasoning for quality and accuracy   |
+|**Strategist**|High-level planning, goal decomposition, and task routing                        |
+|**Critic**    |Challenges assumptions, identifies weaknesses, prevents overconfident conclusions|
+|**Archivist** |Manages persistent memory, context retrieval, and long-term knowledge storage    |
+
+Each agent has a defined responsibility. No single agent controls the full pipeline. The Critic exists specifically to challenge the Strategist. The Auditor exists to catch what both miss.
 
 -----
 
 ## Architecture
 
-HNIS is built around a deliberate hybrid AI routing strategy:
+```
+User Input
+    │
+    ▼
+Strategist ──────────────────────────────┐
+    │                                     │
+    ▼                                     ▼
+Critic ◄──── feedback loop ────── Auditor
+    │
+    ▼
+Archivist (persistent memory read/write)
+    │
+    ▼
+Output + Decision Record
+```
 
-|Task                                                 |Model                |Reason                                              |
-|-----------------------------------------------------|---------------------|----------------------------------------------------|
-|Complex reasoning, summarization, contextual analysis|Claude API           |Accuracy and depth                                  |
-|All sensitive/personal data processing               |Local Ollama instance|Privacy sovereignty — data never leaves your machine|
-
-This means you get the capability of frontier AI where it counts, without sacrificing privacy where it matters.
+The system uses a QA routing layer built in LangGraph that governs agent transitions, prevents infinite loops, and ensures every output passes a validation checkpoint before delivery.
 
 -----
 
 ## Core Stack
 
-- **Backend:** Python · FastAPI
-- **AI Layer:** Claude API · Ollama (local)
-- **Data:** PostgreSQL
-- **Dashboard:** Local visual interface, screen reader accessible
-- **Alerting:** Local delivery to iOS (iPhone)
-- **Architecture:** Local-first · Privacy-first · No required cloud dependency
+- **Orchestration:** Python · LangGraph
+- **API Layer:** FastAPI
+- **Primary AI:** Claude API (complex reasoning, agent logic)
+- **Vector Memory:** Qdrant
+- **Relational Storage:** PostgreSQL
+- **Configuration:** Centralized `core/config.py` — single source of truth for all environment variables and LLM clients
 
 -----
 
 ## Design Principles
 
-**Privacy sovereignty** — Sensitive data is processed exclusively on-device via local Ollama. Nothing personal touches an external API.
+**Near-zero hallucination tolerance** — The Auditor and Critic agents exist specifically to challenge and validate reasoning at every step. Trust is earned inside the pipeline, not assumed.
 
-**Signal over noise** — The system is designed to be quiet. An alert means something. Noise is filtered before it reaches you.
+**Self-correcting loops** — Nexus doesn’t fail silently. When an agent produces output below threshold, the pipeline routes back for correction before proceeding.
 
-**Accessibility by default** — The dashboard and alert delivery are built with screen reader compatibility from the ground up, not retrofitted.
+**Long-term durability** — Decisions, reasoning chains, and context are persisted via the Archivist. The system learns from its own history across sessions.
 
-**Self-contained operation** — Once deployed, HNIS runs without ongoing manual intervention. It watches so you don’t have to.
+**Privacy-aware by design** — Sensitive context stays within defined boundaries. The hybrid routing strategy keeps appropriate data local when needed.
+
+**Separation of concerns** — Each agent does one thing well. The architecture resists the temptation to build one all-knowing agent and instead distributes responsibility intentionally.
 
 -----
 
-## Security
+## Security & Stability
 
-- JWT authentication on all API endpoints
-- CORS protection
-- No hardcoded credentials — environment-based configuration via central `core/config.py`
-- All sensitive processing air-gapped to local model layer
-- XSS protections in dashboard layer
+- JWT authentication on all FastAPI endpoints
+- CORS protection configured
+- No hardcoded credentials — all secrets via environment configuration
+- Pydantic validation throughout the agent pipeline
+- LangGraph QA router with loop prevention safeguards
+- Async handling implemented correctly throughout
 
 -----
 
 ## Status
 
-🔧 **Active development** — Core pipeline, dashboard, and alert delivery operational. Ongoing refinement of signal filtering and source coverage.
+🔧 **Active development** — Core agent team, LangGraph orchestration, and persistence layer operational. Ongoing work on agent communication protocols and Archivist retrieval optimization.
 
 -----
 
 ## Roadmap
 
-- [ ] Expanded public source coverage
-- [ ] Configurable alert thresholds per source type
-- [ ] Enhanced dashboard accessibility features
-- [ ] Self-healing pipeline recovery
-- [ ] Packaged self-serve deployment option
+- [ ] Enhanced Critic feedback specificity
+- [ ] Archivist semantic retrieval improvements
+- [ ] Expanded agent roles for domain-specific workloads
+- [ ] Monitoring and observability dashboard
+- [ ] Configurable agent confidence thresholds
 
 -----
 
 ## Philosophy
 
-Most people building monitoring tools are building them for organizations with security teams and budgets. HNIS is built for individuals — people who want to know what’s happening around them, protect what matters to them, and not hand that responsibility to a corporation.
+Most AI systems are built to impress in a pitch deck. Nexus is built to be useful in six months when no one is watching. That means catching errors, persisting memory, questioning its own conclusions, and running without hand-holding.
 
-Intelligence should be accessible to everyone, not just those who can afford an enterprise contract.
+The measure of a good autonomous system isn’t what it does when everything goes right. It’s what it does when something goes wrong.
 
 -----
 
